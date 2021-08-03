@@ -1,21 +1,103 @@
 {% extends 'photos/main.html' %}
+{% load humanize %}
 
 {% block content %}
+  <style>
+    .img-thumbnail {
+      height: 450px;
+      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
 
-<a href="{% url 'gallery' %}" class="btn btn-dark my-3">Go Back</a>
-<div class="row justify-content-center">
-  <div class="col-md-9">
-    <h1>{{ photo.category.name }}</h1>
-    <div style="height: 90vh">
-      <img
-        src="{{ photo.image.url }}"
-        alt="Card image"
-        style="max-width: 100%; max-height: 100%"
-      />
-      <br />
-      <p>{{ photo.description }}</p>
+    }
+  </style>
+  {% include 'photos/parts/goback.html' %}
+  <div class="row justify-content-center">
+    <h1 class="text-center">{{ photo.category.name }}</h1>
+    <div class="col-md-9">
+      <div class="mx-auto">
+        <img
+                src="{{ photo.image.url }}"
+                alt="Card image"
+                class="img-thumbnail"
+        />
+        <br/>
+      </div>
+      <h6><a href="/photos/user">{{ photo.get_full_name }}</a></h6>
+      <span class="text-muted">{{ photo.date_created|naturalday }}</span>
+      <hr/>
+      <p class="text-content text-wrap text-break">"{{ photo.description }}"</p>
+    </div>
+    <div class="col-md-3">
+      <h2 class="text-center">Leave a comment</h2>
+      {% if request.user.is_authenticated %}
+        <form method="POST" id="comment_form">
+          {% csrf_token %}
+          <p>
+            <textarea name="comment" class="form-control" placeholder="Comment"></textarea>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-secondary">Submit</button>
+          </p>
+        </form>
+      {% else %}
+        <p class="text-center fs-5">You must<a href="{% url 'account_login' %}"> log in</a> to leave comments.</p>
+      {% endif %}
     </div>
   </div>
-</div>
+  <div class="row">
+    <h3>Comments ({{ photo.comments.count }}) </h3>
+    <div class="col-lg-8">
+      {% for comment in photo.comments.all %}
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">{{ comment.user.username }}</h6>
+            <span class="text-muted">{{ comment.date_created|naturaltime }}</span>
+            <hr>
+            <p class="card-text">"{{ comment.content }}"</p>
+          </div>
+        </div>
+        <br/>
+      {% endfor %}
+    </div>
+  </div>
+  <script>
+    const comment_form = document.getElementById('comment_form')
+    csrftoken = document.getElementsByTagName("input")[0].value
+    console.log(csrftoken)
+    comment_form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      console.log('Succesfully')
 
+      submitForm()
+    })
+
+    function submitForm() {
+      const url = '/add_comment/'
+
+      let commentData = {
+        comment: null,
+        photo: '{{ photo.id }}'
+      }
+
+      commentData.comment = comment_form.comment.value
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify({form: commentData})
+      })
+          .then(response => {
+            return response.json()
+          })
+          .then(data => {
+            console.log('Success', data.response)
+            comment_form.comment.value
+            location.reload()
+          })
+    }
+  </script>
 {% endblock %}

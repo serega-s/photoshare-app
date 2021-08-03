@@ -6,4 +6,5 @@ urlpatterns = [
     path('', views.gallery, name="gallery"),
     path('add/', views.add_photo, name="add"),
     path('photo/<str:pk>/', views.view_photo, name="photo"),
+    path('add_comment/', views.add_comment)
 ]
