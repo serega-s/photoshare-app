@@ -26,13 +26,13 @@ def gallery(request):
     return render(request, 'photos/gallery.html', context)
 
 
-def photos_by_user(request, name):
+def photos_by_user(request, username):
     photos = Photo.objects.filter(
-        user__username=name).order_by('-date_created')
+        user__username=username).order_by('-date_created')
 
     context = {
         'photos': photos,
-        'username': name
+        'username': username
     }
 
     return render(request, 'photos/gallery_by.html', context)
@@ -100,7 +100,7 @@ def add_comment(request):
 @login_required
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    photos = request.user.photos
+    photos = user.photos
 
     context = {
         'user': user,
