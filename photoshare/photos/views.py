@@ -21,6 +21,15 @@ def gallery(request):
     }
     return render(request, 'photos/gallery.html', context)
 
+def photos_by_user(request, name):
+    photos = Photo.objects.filter(user__username=name).order_by('-date_created')
+
+    context = {
+        'photos': photos,
+        'username': name
+    }
+
+    return render(request, 'photos/gallery_by.html', context)
 
 def view_photo(request, pk):
     photo = Photo.objects.get(id=pk)

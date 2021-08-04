@@ -1,5 +1,7 @@
-{% extends 'photos/main.html' %} {% block content %}
+{% extends 'photos/main.html' %}
 
+{% block content %}
+{% include 'photos/parts/goback.html' %}
 <div class="row">
   <div class="col-md-3">
     <div class="card" style="width: 15rem">
@@ -22,7 +24,7 @@
     </div>
   </div>
   <div class="col-md-9">
-    <h2>Share photos</h2>
+    <h2>Photos by {{ username }}</h2>
     <div class="row">
       {% for photo in photos %}
       
