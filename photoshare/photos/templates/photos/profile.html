@@ -48,9 +48,11 @@
 </div>
 <div class="row">
     <div class="row">
-      {% for photo in photos.all %}
+      <h2 class="text-center">Last Photos</h2>
+      {% for photo in photos %}
         {% include 'photos/parts/photo_item.html' %}
       {% endfor %}
+      <a class="text-center btn-link" href="{% url 'photos_by_user' user.username %}">View All</a>
   </div>
 </div>
 

@@ -1,0 +1,12 @@
+{% load widget_tweaks %}
+<form class="mb-1">
+  {% csrf_token %}
+  <h2 class="text-center">Filter</h2>
+  <label for="description">Description</label>
+  {{ photo_filter.form.description|add_class:"form-control"|attr:"placeholder:Description" }}
+  
+  <label for="description">Category</label>
+  {{ photo_filter.form.category|add_class:"form-control"|attr:"placeholder:Category" }}
+  <br>
+  <button class="btn btn-outline-success">Filter</button>
+</form>

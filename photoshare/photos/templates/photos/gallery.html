@@ -1,28 +1,17 @@
-{% extends 'photos/main.html' %} {% block content %}
+{% extends 'photos/main.html' %}
 
+{% load widget_tweaks %}
+{% block content %}
+{% if show_back %}
+  {% include 'photos/parts/goback.html' %}
+{% endif %}
 <div class="row">
   <div class="col-md-3">
-    <div class="card" style="width: 15rem">
-      <div class="card-header">Categories:</div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          <a href="{% url 'gallery' %}">All</a>
-        </li>
-        {% for category in categories %}
-        <li class="list-group-item">
-          <a href="{% url 'gallery' %}?category={{ category.name }}"
-            >&RightArrow; {{ category.name }}</a
-          >
-        </li>
-        {% endfor %}
-        <a href="{% url 'add' %}" class="btn btn-block btn-dark btn-sm m-1"
-          >Add Photo</a
-        >
-      </ul>
-    </div>
+    {% include 'photos/parts/photo_filter.html' %}
+    {% include 'photos/parts/category_filter.html' %}
   </div>
   <div class="col-md-9">
-    <h2>Share photos</h2>
+    <h2>{{ header }}</h2>
     <div class="row">
       {% for photo in photos %}
       

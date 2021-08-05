@@ -37,7 +37,7 @@
       const cookies = document.cookie.split(";")
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim()
-        // Does this cookie string begin with the name we want?
+
         if (cookie.substring(0, name.length + 1) === name + "=") {
           cookieValue = decodeURIComponent(
               cookie.substring(name.length + 1)
@@ -51,8 +51,8 @@
 
   let csrftoken = getCsrfToken("csrftoken")
   console.log("CSRFTOKEN:", csrftoken)
-
 </script>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'gallery' %}">Navbar</a>
@@ -68,6 +68,9 @@
         {% if user.is_authenticated %}
           <li>
             <a class="nav-link btn btn-warning m-1" href="{% url 'account_logout' %}">Sign Out</a>
+          </li>
+          <li>
+            <a class="nav-link btn btn-secondary m-1" href="{% url 'profile' user.username %}">Profile</a>
           </li>
         {% else %}
           <li>
@@ -89,7 +92,7 @@
   <div class="container">
     <div class="row">
       <div class="text-center py-3 col">Copyright 2021 © Shop</div>
-      <a class="btn btn-link" href="{% url 'account_logout' %}">Logout</a>
+      <!-- <a class="btn btn-link" href="{% url 'account_logout' %}">Logout</a> -->
     </div>
   </div>
 </footer>

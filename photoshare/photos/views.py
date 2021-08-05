@@ -1,27 +1,26 @@
 import json
-from django.contrib.auth import login
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .filters import PhotoFilter
 from .forms import PhotoForm
 from .models import Category, Comment, Photo
 
 
 def gallery(request):
     categories = Category.objects.all()
-    category = request.GET.get('category')
-    if category:
-        photos = Photo.objects.filter(
-            category__name=category).order_by('-date_created')
-    else:
-        photos = Photo.objects.order_by('-date_created').all()
+    photos = Photo.objects.order_by('-date_created').all()
+    photo_filter = PhotoFilter(request.GET, queryset=photos)
+    photos = photo_filter.qs
 
     context = {
         'photos': photos,
-        'categories': categories
+        'categories': categories,
+        'photo_filter': photo_filter,
+        'header': 'Share photos',
     }
     return render(request, 'photos/gallery.html', context)
 
@@ -29,13 +28,21 @@ def gallery(request):
 def photos_by_user(request, username):
     photos = Photo.objects.filter(
         user__username=username).order_by('-date_created')
+    categories = Category.objects.all()
+    photo_filter = PhotoFilter(request.GET, queryset=photos)
+    photos = photo_filter.qs
+    
 
     context = {
         'photos': photos,
-        'username': username
+        'categories': categories,
+        'photo_filter': photo_filter,
+        'username': username,
+        'header': f'Photos by {username}',
+        'show_back': True
     }
 
-    return render(request, 'photos/gallery_by.html', context)
+    return render(request, 'photos/gallery.html', context)
 
 
 def view_photo(request, pk):
@@ -100,7 +107,7 @@ def add_comment(request):
 @login_required
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    photos = user.photos
+    photos = user.photos.order_by('-date_created').all()[:5]
 
     context = {
         'user': user,
@@ -134,6 +141,7 @@ def followers(request, username):
     }
 
     return render(request, 'photos/followers.html', context)
+
 
 def follows(request, username):
     user = get_object_or_404(User, username=username)
