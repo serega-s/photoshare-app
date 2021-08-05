@@ -3,27 +3,31 @@
 {% load humanize %}
 
 {% block content %}
-<div class="container">
-  <div class="columns">
-    <div class="column is-12">
-      <h1 class="title">Followers {{ user.username }} </h1>
-
-      <p>Num: {{ user.oinkerprofile.followed_by.count }}</p>
-      
-    </div>
-  </div>
-  <div class="columns">
-    <div class="column is-8">
+<h2>{{ user.first_name }}'s followers  </h2>
+<p class="text-content"> {{ user.profile.followed_by.count }} followers</p>
+    
+<div class="row">
+  <div class="col-md-6">
+    <ul class="list-group">
       {% for profile in user.profile.followed_by.all  %}
-        <p><a href="{% url 'profile' profile.user.username %}">{{ profile.user.username }}</a><p>
+        <li class="list-group-item">
+          <p class="my-auto">
+            {% if profile.avatar  %}
+              <img src="{{ profile.avatar.url }}" class="img-rounded-sm" alt="">
+            {% else %}
+              <img src="https://im0-tub-ru.yandex.net/i?id=a53f190616d5598d4d70d2488508ec89&n=13&exp=1" class="img-rounded-sm" alt="">
+            {% endif %}
+            <a href="{% url 'profile' profile.user.username %}">{{ profile.user.get_full_name }}</a>
+          </p>
+        </li>
       {% empty %}
         {% if request.user == user %}
-          <p>Sorry, you don't have any followers</p>
+          <p class="alert alert-warning">You don't have any followers</p>
         {% else %}
-          <p>{{ user.username }} doesn't have any followers!</p>
+          <p class="alert alert-warning">{{ user.first_name }} doesn't have any followers!</p>
         {% endif %}
       {% endfor %}
-    </div>
+    </ul>
   </div>
 </div>
 {% endblock %}

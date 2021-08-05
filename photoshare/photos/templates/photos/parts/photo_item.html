@@ -6,9 +6,9 @@
       alt="Card image ..."
     />
     <div class="card-body">
-      <small>Category: {{ photo.category }}</small>
+      <small class="card-text">Category: {{ photo.category }}</small>
     </div>
-    <a href="{% url 'photo' photo.id %}" class="btn btn-outline-dark btn-sm m-1"
+    <a href="{% url 'photo' photo.id %}" class="btn btn-outline-light btn-sm m-1"
       >View</a
     >
   </div>

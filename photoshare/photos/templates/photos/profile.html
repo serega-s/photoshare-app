@@ -22,7 +22,7 @@
               </div>
             {% endif %}
               <h3 class="m-b-0">{{ user.get_full_name }}</h3>
-              <p>{% if user.profile.bio %}{{ user.profile.bio }}{% else %}{% endif %}</p>
+              <p class="text-content">{% if user.profile.bio %}{{ user.profile.bio }}{% endif %}</p>
               {% if user != request.user %}
                 {% if request.user.profile in user.profile.followed_by.all %}
                   <a href="{% url 'unfollow_user' user.username %}" class="m-t-10 waves-effect waves-dark btn btn-primary btn-md btn-rounded">Unfollow</a>
@@ -33,13 +33,13 @@
               
               <div class="row text-center m-t-20">
                   <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light">{{ photos.count }}</h3><small><a href="{% url 'photos_by_user' user.username %}">Articles</a></small>
+                      <h3 class="m-b-0 font-light text-content">{{ photos.count }}</h3><small><a class="a" href="{% url 'photos_by_user' user.username %}">Articles</a></small>
                   </div>
                   <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light">{{ user.profile.followed_by.count }}</h3><small><a href="{% url 'followers' user.username %}">Followers</a></small>
+                      <h3 class="m-b-0 font-light text-content">{{ user.profile.followed_by.count }}</h3><small><a class="a" href="{% url 'followers' user.username %}">Followers</a></small>
                   </div>
                   <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light">{{ user.profile.follows.count }}</h3><small><a href="{% url 'follows' user.username %}">Following</a></small>
+                      <h3 class="m-b-0 font-light text-content" >{{ user.profile.follows.count }}</h3><small><a class="a" href="{% url 'follows' user.username %}">Following</a></small>
                   </div>
               </div>
           </div>

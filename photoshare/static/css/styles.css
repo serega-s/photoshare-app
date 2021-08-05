@@ -11,6 +11,13 @@ body {
   padding: 3rem !important;
   margin-left: 200px;
 }
+.card {
+  background-color: rgb(40, 40, 40);
+}
+.card-text,
+.card-header {
+  color: rgb(152, 152, 152);
+}
 
 .card-img-top {
   height: 300px;
@@ -101,4 +108,27 @@ h6 {
 p {
   margin-top: 0;
   margin-bottom: 1rem;
+}
+
+.img-rounded-sm {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+label {
+  color: rgb(152, 152, 152);
+}
+.text-content {
+  color: rgb(169, 169, 169);
+}
+
+.a {
+  color: rgb(85, 85, 85);
+  text-decoration: none;
+}
+
+a .nav-link {
+  color: rgb(221, 221, 221) !important;
+  text-decoration: none;
 }

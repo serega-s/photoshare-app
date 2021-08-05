@@ -40,10 +40,10 @@ class Comment(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False)
+    follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False, blank=True)
     bio = models.CharField(max_length=255, blank=True, null=True)
     card_image = models.ImageField(blank=True, null=True)
-    avatar = models.ImageField(blank=True, null=True)
+    avatar = models.ImageField(blank=True, null=True, default='https://im0-tub-ru.yandex.net/i?id=a53f190616d5598d4d70d2488508ec89&n=13&exp=1')
 
     def __str__(self):
         return self.user.username

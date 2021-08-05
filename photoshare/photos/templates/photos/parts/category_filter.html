@@ -2,11 +2,11 @@
   <div class="card-header">Categories:</div>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <a href="?">All</a>
+      <a class="a" href="?">All</a>
     </li>
     {% for category in categories %}
     <li class="list-group-item">
-      <a href="?category={{ category.name }}"
+      <a href="?category={{ category.name }}" class="a"
         >&RightArrow; {{ category.name }}</a
       >
     </li>
