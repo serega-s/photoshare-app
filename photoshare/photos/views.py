@@ -6,8 +6,8 @@ from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .filters import PhotoFilter
-from .forms import PhotoForm
-from .models import Category, Comment, Photo
+from .forms import PhotoForm, ProfileForm
+from .models import Category, Comment, Photo, Profile
 
 
 def gallery(request):
@@ -151,3 +151,33 @@ def follows(request, username):
     }
 
     return render(request, 'photos/follows.html', context)
+
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        data = request.POST
+
+        if form.is_valid():
+            form_cd = form.cleaned_data
+            print(form_cd, data)
+            print(request.user.first_name)
+
+            profile.card_image = form_cd['card_image']
+            profile.avatar = form_cd['avatar']
+            profile.bio = form_cd['bio']
+
+            profile.save()
+            
+            return redirect('profile', request.user.username)
+    else:
+        form = ProfileForm(instance=profile)
+
+    context = {
+        'profile': profile,
+        'form': form
+    }
+    return render(request, 'photos/edit_profile.html', context)

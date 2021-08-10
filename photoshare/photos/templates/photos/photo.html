@@ -91,11 +91,8 @@
         },
         body: JSON.stringify({form: commentData})
       })
-          .then(response => {
-            return response.json()
-          })
+          .then(response => response.json())
           .then(data => {
-            console.log('Success', data.response)
             comment_form.comment.value
             location.reload()
           })

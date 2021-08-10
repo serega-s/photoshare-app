@@ -1,12 +1,24 @@
-from django import forms
-from .models import Photo
 from allauth.account.forms import SignupForm
+from django import forms
+
+from .models import Photo, Profile
 
 
 class PhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
         fields = '__all__'
+
+
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = [
+            'card_image',
+            'avatar',
+            'bio',
+        ]
 
 
 class CustomSignupForm(SignupForm):

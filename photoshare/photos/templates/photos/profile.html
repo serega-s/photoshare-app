@@ -4,6 +4,7 @@
 
 {% block content %}
 {% include 'photos/parts/goback.html' %}
+<h1 class="text-center">Profile</h1>
 <div class="padding">
   <div class="col-md-8">
       <div class="card">
@@ -13,36 +14,40 @@
           <img class="card-img-top" src="https://i.imgur.com/K7A78We.jpg" alt="Card image cap">
         {% endif %}
         
-          <div class="card-body little-profile text-center">
-            {% if user.profile.avatar %}
-              <div class="pro-img"><img src="{{ user.profile.avatar.url }}" alt="user"></div>
-            {% else %}
-              <div class="pro-img">
-                <img src="https://im0-tub-ru.yandex.net/i?id=a53f190616d5598d4d70d2488508ec89&n=13&exp=1" class="img-rounded" alt="">
-              </div>
-            {% endif %}
-              <h3 class="m-b-0">{{ user.get_full_name }}</h3>
-              <p class="text-content">{% if user.profile.bio %}{{ user.profile.bio }}{% endif %}</p>
-              {% if user != request.user %}
-                {% if request.user.profile in user.profile.followed_by.all %}
-                  <a href="{% url 'unfollow_user' user.username %}" class="m-t-10 waves-effect waves-dark btn btn-primary btn-md btn-rounded">Unfollow</a>
-                {% else %}
-                  <a href="{% url 'follow_user' user.username %}" class="m-t-10 waves-effect waves-dark btn btn-primary btn-md btn-rounded">Follow</a>
-                {% endif %}
+        {% if user == request.user %}
+        <a href="{% url 'edit_profile' %}" class="btn btn-link btn-sm d-flex">Change Profile</a>
+        {% endif %}
+
+        <div class="card-body little-profile text-center">
+          {% if user.profile.avatar %}
+            <div class="pro-img"><img src="{{ user.profile.avatar.url }}" alt="user"></div>
+          {% else %}
+            <div class="pro-img">
+              <img src="https://im0-tub-ru.yandex.net/i?id=a53f190616d5598d4d70d2488508ec89&n=13&exp=1" class="img-rounded" alt="">
+            </div>
+          {% endif %}
+            <h3 class="m-b-0">{{ user.get_full_name }}</h3>
+            <p class="text-content">{% if user.profile.bio %}{{ user.profile.bio }}{% endif %}</p>
+            {% if user != request.user %}
+              {% if request.user.profile in user.profile.followed_by.all %}
+                <a href="{% url 'unfollow_user' user.username %}" class="m-t-10 waves-effect waves-dark btn btn-primary btn-md btn-rounded">Unfollow</a>
+              {% else %}
+                <a href="{% url 'follow_user' user.username %}" class="m-t-10 waves-effect waves-dark btn btn-primary btn-md btn-rounded">Follow</a>
               {% endif %}
-              
-              <div class="row text-center m-t-20">
-                  <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light text-content">{{ photos.count }}</h3><small><a class="a" href="{% url 'photos_by_user' user.username %}">Articles</a></small>
-                  </div>
-                  <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light text-content">{{ user.profile.followed_by.count }}</h3><small><a class="a" href="{% url 'followers' user.username %}">Followers</a></small>
-                  </div>
-                  <div class="col-lg-4 col-md-4 m-t-20">
-                      <h3 class="m-b-0 font-light text-content" >{{ user.profile.follows.count }}</h3><small><a class="a" href="{% url 'follows' user.username %}">Following</a></small>
-                  </div>
-              </div>
-          </div>
+            {% endif %}
+            
+            <div class="row text-center m-t-20">
+                <div class="col-lg-4 col-md-4 m-t-20">
+                    <h3 class="m-b-0 font-light text-content">{{ photos.count }}</h3><small><a class="a" href="{% url 'photos_by_user' user.username %}">Articles</a></small>
+                </div>
+                <div class="col-lg-4 col-md-4 m-t-20">
+                    <h3 class="m-b-0 font-light text-content">{{ user.profile.followed_by.count }}</h3><small><a class="a" href="{% url 'followers' user.username %}">Followers</a></small>
+                </div>
+                <div class="col-lg-4 col-md-4 m-t-20">
+                    <h3 class="m-b-0 font-light text-content" >{{ user.profile.follows.count }}</h3><small><a class="a" href="{% url 'follows' user.username %}">Following</a></small>
+                </div>
+            </div>
+        </div>
       </div>
   </div>
 </div>
