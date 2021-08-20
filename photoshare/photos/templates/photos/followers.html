@@ -3,6 +3,7 @@
 {% load humanize %}
 
 {% block content %}
+{% include 'photos/parts/goback.html' %}
 <h2>{{ user.first_name }}'s followers  </h2>
 <p class="text-content"> {{ user.profile.followed_by.count }} followers</p>
     
@@ -17,7 +18,7 @@
             {% else %}
               <img src="https://im0-tub-ru.yandex.net/i?id=a53f190616d5598d4d70d2488508ec89&n=13&exp=1" class="img-rounded-sm" alt="">
             {% endif %}
-            <a href="{% url 'profile' profile.user.username %}">{{ profile.user.get_full_name }}</a>
+            <a href="{{ profile.get_absolute_url }}">{{ profile.user.get_full_name }}</a>
           </p>
         </li>
       {% empty %}

@@ -116,7 +116,11 @@ p {
   border-radius: 50%;
 }
 
-label {
+ul,li {
+  list-style-type: none;
+}
+
+li, label {
   color: rgb(152, 152, 152);
 }
 .text-content {

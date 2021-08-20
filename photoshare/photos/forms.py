@@ -1,13 +1,19 @@
 from allauth.account.forms import SignupForm
 from django import forms
 
-from .models import Photo, Profile
+from .models import Category, Photo, Profile
 
 
 class PhotoForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        required=False, queryset=Category.objects.all(), )
+
     class Meta:
         model = Photo
-        fields = '__all__'
+        fields = [
+            'image',
+            'description'
+        ]
 
 
 class ProfileForm(forms.ModelForm):

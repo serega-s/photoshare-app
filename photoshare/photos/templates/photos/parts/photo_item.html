@@ -8,7 +8,7 @@
     <div class="card-body">
       <small class="card-text">Category: {{ photo.category }}</small>
     </div>
-    <a href="{% url 'photo' photo.id %}" class="btn btn-outline-light btn-sm m-1"
+    <a href="{{ photo.get_absolute_url }}" class="btn btn-outline-light btn-sm m-1"
       >View</a
     >
   </div>

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django.db import models
 
 
@@ -25,6 +26,9 @@ class Photo(models.Model):
     @property
     def get_full_name(self):
         return f'{self.user.first_name} {self.user.last_name}'
+
+    def get_absolute_url(self):
+        return reverse('photo', kwargs={'pk': self.id})
 
 
 class Comment(models.Model):
@@ -53,6 +57,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'username': self.user.username})
 
 
 User.profile = property(

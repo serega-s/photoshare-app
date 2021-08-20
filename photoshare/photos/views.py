@@ -1,120 +1,124 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.http.response import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http.response import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
+from django.views.generic import DetailView
+from django.views.generic.edit import FormView, UpdateView
+from django_filters.views import FilterView
 
 from .filters import PhotoFilter
 from .forms import PhotoForm, ProfileForm
 from .models import Category, Comment, Photo, Profile
 
 
-def gallery(request):
-    categories = Category.objects.all()
-    photos = Photo.objects.order_by('-date_created').all()
-    photo_filter = PhotoFilter(request.GET, queryset=photos)
-    photos = photo_filter.qs
+class Gallery(FilterView):
+    template_name = 'photos/gallery.html'
+    queryset = Photo.objects.order_by('-date_created').all()
+    filterset_class = PhotoFilter
 
-    context = {
-        'photos': photos,
-        'categories': categories,
-        'photo_filter': photo_filter,
-        'header': 'Share photos',
-    }
-    return render(request, 'photos/gallery.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photo_filter'] = self.filterset
+        context['photos'] = self.filterset.qs
+        context['categories'] = Category.objects.all()
 
-
-def photos_by_user(request, username):
-    photos = Photo.objects.filter(
-        user__username=username).order_by('-date_created')
-    categories = Category.objects.all()
-    photo_filter = PhotoFilter(request.GET, queryset=photos)
-    photos = photo_filter.qs
-    
-
-    context = {
-        'photos': photos,
-        'categories': categories,
-        'photo_filter': photo_filter,
-        'username': username,
-        'header': f'Photos by {username}',
-        'show_back': True
-    }
-
-    return render(request, 'photos/gallery.html', context)
+        return context
 
 
-def view_photo(request, pk):
-    photo = Photo.objects.get(id=pk)
-    context = {
-        'photo': photo
-    }
-    return render(request, 'photos/photo.html', context)
+class UserGallery(FilterView):
+    template_name = 'photos/gallery.html'
+    queryset = Photo.objects.order_by('-date_created').all()
+    filterset_class = PhotoFilter
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user__username=self.kwargs['username'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photo_filter'] = self.filterset
+        context['photos'] = self.filterset.qs
+        context['categories'] = Category.objects.all()
+        context['show_back'] = True
+        context['username'] = self.kwargs['username']
+        context['header'] = f'Photos by {self.kwargs["username"]}'
+
+        return context
 
 
-@login_required
-def add_photo(request):
-    categories = Category.objects.all()
-
-    if request.method == 'POST':
-        form = PhotoForm(request.POST, request.FILES)
-        data = request.POST
-
-        if form.is_valid():
-            form_cd = form.cleaned_data
-            print(form_cd)
-
-            if form_cd['category']:
-                category = Category.objects.get(name=form_cd['category'])
-            elif data['category_new']:
-                category, created = Category.objects.get_or_create(
-                    name=data['category_new'])
-            else:
-                category = None
-
-            form.save(commit=False)
-
-            photo = Photo.objects.create(
-                category=category,
-                description=form_cd['description'],
-                image=form_cd['image']
-            )
-            return redirect('gallery')
-    else:
-        form = PhotoForm()
-
-    context = {
-        'categories': categories,
-        'form': PhotoForm
-    }
-    return render(request, 'photos/add.html', context)
+class ViewPhoto(DetailView):
+    context_object_name = 'photo'
+    template_name = 'photos/photo.html'
+    queryset = Photo.objects.all()
 
 
-@login_required
-def add_comment(request):
-    data = json.loads(request.body)
-    print(data)
+class AddPhoto(LoginRequiredMixin, FormView):
+    template_name = 'photos/add.html'
+    form_class = PhotoForm
+    success_url = '/'
 
-    Comment.objects.create(
-        user=request.user,
-        photo_id=int(data['form']['photo']),
-        content=data['form']['comment'],
-    )
-    return JsonResponse('Comment Added', safe=False)
+    def form_valid(self, form):
+        form_cd = form.cleaned_data
+        data = self.request.POST
+
+        if form_cd['category']:
+            category = Category.objects.get(name=form_cd['category'])
+        elif data['category_new']:
+            category, created = Category.objects.get_or_create(
+                name=data['category_new'])
+        else:
+            category = None
+
+        form.save(commit=False)
+
+        photo = Photo.objects.create(
+            user=self.request.user,
+            category=category,
+            description=form_cd['description'],
+            image=form_cd['image']
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+
+        return context
 
 
-@login_required
-def profile(request, username):
-    user = get_object_or_404(User, username=username)
-    photos = user.photos.order_by('-date_created').all()[:5]
+class AddComment(LoginRequiredMixin, View):
+    def post(self, request):
+        data = json.loads(request.body)
 
-    context = {
-        'user': user,
-        'photos': photos
-    }
+        comment = Comment.objects.create(
+            user=request.user,
+            photo_id=int(data['form']['photo']),
+            content=data['form']['comment'],
+        )
 
-    return render(request, 'photos/profile.html', context)
+        return JsonResponse('Comment Added', safe=False)
+
+
+class UserProfile(LoginRequiredMixin, DetailView):
+    model = User
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    template_name = 'photos/profile.html'
+    context_object_name = 'user'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['photos'] = self.request.user.photos.order_by(
+            '-date_created').all()[:5]
+
+        return context
 
 
 @login_required
@@ -133,51 +137,39 @@ def unfollow_user(request, username):
     return redirect('profile', username=username)
 
 
-def followers(request, username):
-    user = get_object_or_404(User, username=username)
-
-    context = {
-        'user': user,
-    }
-
-    return render(request, 'photos/followers.html', context)
+class Followers(DetailView):
+    model = User
+    template_name = 'photos/followers.html'
+    context_object_name = 'user'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
 
 
-def follows(request, username):
-    user = get_object_or_404(User, username=username)
-
-    context = {
-        'user': user,
-    }
-
-    return render(request, 'photos/follows.html', context)
+class Follows(DetailView):
+    model = User
+    template_name = 'photos/follows.html'
+    context_object_name = 'user'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
 
 
-@login_required
-def edit_profile(request):
-    profile = request.user.profile
+class EditProfile(LoginRequiredMixin, UpdateView):
+    template_name = 'photos/edit_profile.html'
+    queryset = Profile.objects.all()
+    form_class = ProfileForm
+    context_object_name = 'profile'
 
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        data = request.POST
+    def get_object(self):
+        return self.queryset.get(user=self.request.user)
 
-        if form.is_valid():
-            form_cd = form.cleaned_data
-            print(form_cd, data)
-            print(request.user.first_name)
+    def form_valid(self, form):
+        form_cd = form.cleaned_data
+        profile = self.request.user.profile
 
-            profile.card_image = form_cd['card_image']
-            profile.avatar = form_cd['avatar']
-            profile.bio = form_cd['bio']
+        profile.card_image = form_cd['card_image']
+        profile.avatar = form_cd['avatar']
+        profile.bio = form_cd['bio']
 
-            profile.save()
-            
-            return redirect('profile', request.user.username)
-    else:
-        form = ProfileForm(instance=profile)
+        profile.save()
 
-    context = {
-        'profile': profile,
-        'form': form
-    }
-    return render(request, 'photos/edit_profile.html', context)
+        return HttpResponseRedirect(profile.get_absolute_url())

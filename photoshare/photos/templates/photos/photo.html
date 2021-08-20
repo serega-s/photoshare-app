@@ -23,8 +23,10 @@
         />
         <br/>
       </div>
-      <br>
+      <br />
+
       <h6><a class="a" href="{% url 'profile' photo.user.username %}">{{ photo.get_full_name }}</a></h6>
+
       <span class="text-muted">{{ photo.date_created|naturalday }}</span>
       <hr/>
       <p class="text-content text-wrap text-break">"{{ photo.description }}"</p>
